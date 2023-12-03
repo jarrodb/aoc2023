@@ -2,6 +2,7 @@ use std::io;
 use clap::{Parser, Subcommand};
 
 mod day1;
+mod day2;
 
 #[derive(Parser)]
 #[command(about="Advent of Code 2023")]
@@ -34,6 +35,11 @@ fn main() {
             let data = read_from_stdin();
             println!("part1: {}", day1::part1(&data));
             println!("part2: {}", day1::part2(&data));
+        },
+        Some(SubCommand::Day2) => {
+            let data = read_from_stdin();
+            println!("part1: {}", day2::part1(&data));
+            println!("part2: {}", day2::part2(&data));
         },
         _ => {
             println!("no subcommand given");
