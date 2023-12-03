@@ -1,3 +1,5 @@
+use std::cmp::max;
+
 struct Game {
     id: i32,
     sets: Vec<GameSet>,
@@ -31,17 +33,9 @@ impl Game {
         let mut blue = 0;
 
         for set in self.sets.iter() {
-            if set.red > red {
-                red = set.red;
-            }
-
-            if set.green > green {
-                green = set.green;
-            }
-
-            if set.blue > blue {
-                blue = set.blue;
-            }
+            red = max(red, set.red);
+            green = max(green, set.green);
+            blue = max(blue, set.blue);
         }
         return (red, green, blue);
     }
