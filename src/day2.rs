@@ -82,31 +82,25 @@ fn parse_game(input: &str) -> Game {
             continue
         }
 
-        match c {
-            ':' => {
+        match (c, last_char) {
+            (':', _) => {
                 // capture the game id from buffer and reset
                 game.id = buffer.parse::<i32>().unwrap();
                 buffer.clear();
             },
-            'r' => { // red
-                if last_char == ' ' {
-                    red = buffer.parse::<i32>().unwrap();
-                    buffer.clear();
-                }
+            ('r', ' ') => { // red
+                red = buffer.parse::<i32>().unwrap();
+                buffer.clear();
             },
-            'g' => { // green
-                if last_char == ' ' {
-                    green = buffer.parse::<i32>().unwrap();
-                    buffer.clear();
-                }
+            ('g', ' ') => { // green
+                green = buffer.parse::<i32>().unwrap();
+                buffer.clear();
             },
-            'b' => { // blue
-                if last_char == ' ' {
-                    blue = buffer.parse::<i32>().unwrap();
-                    buffer.clear();
-                }
+            ('b', ' ') => { // blue
+                blue = buffer.parse::<i32>().unwrap();
+                buffer.clear();
             },
-            ';' => {
+            (';', _) => {
                 // game set finished; save and reset
                 game.add_set(GameSet {red: red, green: green, blue: blue});
                 (red, green, blue) = (0, 0, 0);
