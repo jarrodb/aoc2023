@@ -50,6 +50,11 @@ fn main() {
             println!("part1: {}", day3::part1(&data));
             println!("part2: {}", day3::part2(&data));
         },
+        Some(SubCommand::Day4) => {
+            let data = read_from_stdin();
+            println!("part1: {}", day4::part1(&data));
+            println!("part2: {}", day4::part2(&data));
+        },
         _ => {
             println!("no subcommand given");
         },
