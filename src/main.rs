@@ -4,6 +4,7 @@ use clap::{Parser, Subcommand};
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 #[derive(Parser)]
 #[command(about="Advent of Code 2023")]
@@ -17,6 +18,7 @@ enum SubCommand {
     Day1,
     Day2,
     Day3,
+    Day4,
 }
 
 fn read_from_stdin() -> Vec<String> {
