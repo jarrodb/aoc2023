@@ -17,22 +17,14 @@ impl Entry {
         for (i, _) in self.text.chars().enumerate() {
             // yes, super ghetto
             let new_x: i32 = self.x + (i as i32);
-            // left
-            coordinates.push(format!("{}_{}", new_x - 1, self.y));
-            // right
-            coordinates.push(format!("{}_{}", new_x + 1, self.y));
-            // up
-            coordinates.push(format!("{}_{}", new_x, self.y - 1));
-            // down
-            coordinates.push(format!("{}_{}", new_x, self.y + 1));
-            // diag upleft
-            coordinates.push(format!("{}_{}", new_x - 1, self.y - 1));
-            // diag upright
-            coordinates.push(format!("{}_{}", new_x + 1, self.y - 1));
-            // diag downleft
-            coordinates.push(format!("{}_{}", new_x - 1, self.y + 1));
-            // diag downright
-            coordinates.push(format!("{}_{}", new_x + 1, self.y + 1));
+            coordinates.push(format!("{}_{}", new_x - 1, self.y)); // left
+            coordinates.push(format!("{}_{}", new_x + 1, self.y)); // right
+            coordinates.push(format!("{}_{}", new_x, self.y - 1)); // up
+            coordinates.push(format!("{}_{}", new_x, self.y + 1)); // down
+            coordinates.push(format!("{}_{}", new_x - 1, self.y - 1)); // upleft
+            coordinates.push(format!("{}_{}", new_x + 1, self.y - 1)); // upright
+            coordinates.push(format!("{}_{}", new_x - 1, self.y + 1)); // downleft
+            coordinates.push(format!("{}_{}", new_x + 1, self.y + 1)); // downright
         }
         return coordinates;
     }
