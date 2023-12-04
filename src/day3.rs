@@ -63,19 +63,19 @@ pub fn part2(input: &Vec<String>) -> i32 {
         // check all surrounding coordinates for a symbols match
         for c in e.surrounding_coordinates().iter() {
             match symbols.get(c) {
-                Some(s) => {
-                    if s == "*" {
-                        // insert the  entry number at c
-                        let value = e.text.parse::<i32>().unwrap();
-                        gears.entry(c.to_string()).or_insert(Vec::<i32>::new()).push(value);
-                        break; // go to next entry if matched
-                    }
+                Some(s) if s.to_string() == "*" => {
+                    // append the entry part number at c
+                    let value = e.text.parse::<i32>().unwrap();
+                    gears.entry(c.to_string()).or_insert(Vec::<i32>::new()).push(value);
+                    break; // go to next entry if matched
                 },
+                Some(_) => {},
                 None => {},
             }
         }
     }
 
+    // add the products of gears touching two "part numbers"
     for (_, v) in gears.iter() {
         if v.len() == 2 {
             sum += v[0] * v[1];
