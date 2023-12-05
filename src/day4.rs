@@ -92,7 +92,7 @@ pub fn part1(input: &Vec<String>) -> i32 {
 }
 
 pub fn part2(input: &Vec<String>) -> i32 {
-    let mut cards: Vec<i32> = input
+    let cards: Vec<i32> = input
         .iter()
         .map(|line| Card::new(line).total_matches())
         .collect();
