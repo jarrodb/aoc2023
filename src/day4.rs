@@ -5,45 +5,48 @@ enum ParseMode {
     Mine,
 }
 
-pub fn part1(input: &Vec<String>) -> i32 {
-    let mut sum: i32 = 0;
+struct Card {
+    id: i32,
+    winning: Vec<i32>,
+    mine: Vec<i32>,
+}
 
-    for line in input.iter() {
+impl Card {
+    fn new(line: &str) -> Card {
+        let mut scratch = Card {
+            id: 0,
+            winning: Vec::<i32>::new(),
+            mine: Vec::<i32>::new()
+        };
+
         let mut mode = ParseMode::Card;
         let mut buffer = String::new();
-        let mut score: i32 = 0;
-        let mut winning_cards: Vec<i32> = Vec::new();
 
         for c in line.chars() {
             if c.is_digit(10) {
                 buffer.push(c);
                 continue;
             }
+
             match (c, mode) {
                 (':', ParseMode::Card) => {
-                    mode = ParseMode::Winning;
-                    //let card_id: i32 = buffer.parse().unwrap();
-                    //println!("Card: {}", card_id);
+                    mode = ParseMode::Winning; // transition mode
+                    scratch.id = buffer.parse::<i32>().unwrap();
                     buffer.clear();
                 },
                 ('|', ParseMode::Winning) => {
-                    mode = ParseMode::Mine;
+                    mode = ParseMode::Mine; // transition mode
                     buffer.clear();
                 },
                 (_, ParseMode::Winning) => {
-                    if !buffer.is_empty() {
-                        let card: i32 = buffer.parse().unwrap();
-                        winning_cards.push(card.clone());
+                    if let Ok(num) = buffer.parse::<i32>() {
+                        scratch.winning.push(num.clone());
                         buffer.clear();
                     }
                 },
                 (_, ParseMode::Mine) => {
-                    if !buffer.is_empty() {
-                        let card: i32 = buffer.parse().unwrap();
-                        if winning_cards.contains(&card) {
-                            let s = if score == 0 { 1 } else { score };
-                            score += s;
-                        }
+                    if let Ok(num) = buffer.parse::<i32>() {
+                        scratch.mine.push(num.clone());
                         buffer.clear();
                     }
                 }
@@ -51,22 +54,60 @@ pub fn part1(input: &Vec<String>) -> i32 {
             }
         }
 
-        if !buffer.is_empty() {
-            // don't repeat this
-            let card: i32 = buffer.parse().unwrap(); 
-            if winning_cards.contains(&card) {
-                let s = if score == 0 { 1 } else { score };
-                score += s;
-            }
+        // process the last number
+        if let Ok(num) = buffer.parse::<i32>() {
+            scratch.mine.push(num.clone());
+            buffer.clear();
         }
 
-        sum += score;
+        return scratch;
     }
-    return sum;
+
+    fn score(&self) -> i32 {
+        let mut score = 0;
+        for card in self.winning.iter() {
+            if self.mine.contains(card) {
+                score += if score == 0 { 1 } else { score };
+            }
+        }
+        return score;
+    }
+
+    fn total_matches(&self) -> i32 {
+        let mut matches = 0;
+        for card in self.winning.iter() {
+            if self.mine.contains(card) {
+                matches += 1;
+            }
+        }
+        return matches;
+    }
 }
 
-pub fn part2(_input: &Vec<String>) -> i32 {
-    return 0;
+pub fn part1(input: &Vec<String>) -> i32 {
+    return input
+        .iter()
+        .map(|line| Card::new(line).score())
+        .sum();
+}
+
+pub fn part2(input: &Vec<String>) -> i32 {
+    let mut cards: Vec<i32> = input
+        .iter()
+        .map(|line| Card::new(line).total_matches())
+        .collect();
+
+    // i got help online for the rest of this function
+    let mut card_count: Vec<i32> = vec![1; cards.len()];
+
+    for i in 0..cards.len() {
+        let matches = cards[i] as usize;
+        for j in (i + 1)..std::cmp::min(i + 1 + matches, cards.len()) {
+            card_count[j] += card_count[i];
+        }
+    }
+
+    return card_count.iter().sum();
 }
 
 #[cfg(test)]
@@ -93,6 +134,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(&test_data()), 0);
+        assert_eq!(part2(&test_data()), 30);
     }
 }
