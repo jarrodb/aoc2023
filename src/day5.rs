@@ -1,12 +1,12 @@
 #[derive(Debug)]
 struct Map {
-    src: i32,
-    dst: i32,
-    range: i32,
+    src: i128,
+    dst: i128,
+    range: i128,
 }
 
 impl Map {
-    fn destination(&self, src: i32) -> i32 {
+    fn destination(&self, src: i128) -> i128 {
         if self.src <= src && src < (self.src + self.range) {
             return self.dst + (src - self.src);
         }
@@ -14,13 +14,13 @@ impl Map {
     }
 }
 
-pub fn part1(input: &Vec<String>) -> i32 {
+pub fn part1(input: &Vec<String>) -> i128 {
     let mut sections = Vec::<Vec<Map>>::new();
 
     // capture the seeds on line 1
-    let seeds: Vec<i32> = input[0]
+    let seeds: Vec<i128> = input[0]
         .split(" ")
-        .filter_map(|e| e.parse::<i32>().ok())
+        .filter_map(|e| e.parse::<i128>().ok())
         .collect();
 
     let mut map = Vec::<Map>::new();
@@ -40,10 +40,9 @@ pub fn part1(input: &Vec<String>) -> i32 {
             continue;
         }
 
-        //let entry: Vec<i32> = line.split(" ").iter().map(|e| *e as i32).collect();
-        let entry: Vec<i32> = line
+        let entry: Vec<i128> = line
             .split(" ")
-            .filter_map(|e| e.parse::<i32>().ok())
+            .filter_map(|e| e.parse::<i128>().ok())
             .collect();
         let m = Map{dst: entry[0], src: entry[1], range: entry[2]};
         map.push(m);
