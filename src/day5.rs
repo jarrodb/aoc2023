@@ -1,6 +1,77 @@
+#[derive(Debug)]
+struct Map {
+    src: i32,
+    dst: i32,
+    range: i32,
+}
 
-pub fn part1(_input: &Vec<String>) -> i32 {
-    return 0;
+impl Map {
+    fn destination(&self, src: i32) -> i32 {
+        if self.src <= src && src < (self.src + self.range) {
+            return self.dst + (src - self.src);
+        }
+        return -1; // not found
+    }
+}
+
+pub fn part1(input: &Vec<String>) -> i32 {
+    let mut sections = Vec::<Vec<Map>>::new();
+
+    // capture the seeds on line 1
+    let seeds: Vec<i32> = input[0]
+        .split(" ")
+        .filter_map(|e| e.parse::<i32>().ok())
+        .collect();
+
+    let mut map = Vec::<Map>::new();
+
+    for line in input.iter().skip(2) {
+        if line.is_empty() {
+            // signals the end of a map
+            if map.len() > 0 {
+                sections.push(map);
+            }
+            map = Vec::<Map>::new();
+            continue;
+        }
+
+        if !line.chars().nth(0).unwrap().is_digit(10) {
+            // we don't care about map names
+            continue;
+        }
+
+        //let entry: Vec<i32> = line.split(" ").iter().map(|e| *e as i32).collect();
+        let entry: Vec<i32> = line
+            .split(" ")
+            .filter_map(|e| e.parse::<i32>().ok())
+            .collect();
+        let m = Map{dst: entry[0], src: entry[1], range: entry[2]};
+        map.push(m);
+    }
+
+    // push the last map
+    if map.len() > 0 {
+        sections.push(map);
+    }
+
+    let mut lowest = 0;
+
+    for seed in seeds.iter() { // iterate through all seeds
+        let mut src = *seed;
+        for section in sections.iter() { // translate for each section map
+            for map in section.iter() { // check if valid destination
+                let dst = map.destination(src);
+                if dst > -1 {
+                    src = dst;
+                    break;
+                }
+            }
+        }
+        //println!("seed {} -> {}", seed, src);
+        lowest = if lowest == 0 { src } else { std::cmp::min(lowest, src) };
+    }
+
+    return lowest;
 }
 
 pub fn part2(_input: &Vec<String>) -> i32 {
@@ -53,7 +124,7 @@ mod tests {
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(&test_data()), 0);
+        assert_eq!(part1(&test_data()), 35);
     }
 
     #[test]
