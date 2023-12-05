@@ -41,6 +41,7 @@ pub fn part1(input: &Vec<String>) -> i128 {
         }
 
         let entry: Vec<i128> = line
+            .trim()
             .split(" ")
             .filter_map(|e| e.parse::<i128>().ok())
             .collect();
@@ -73,7 +74,7 @@ pub fn part1(input: &Vec<String>) -> i128 {
     return lowest;
 }
 
-pub fn part2(_input: &Vec<String>) -> i32 {
+pub fn part2(_input: &Vec<String>) -> i128 {
     return 0;
 }
 
