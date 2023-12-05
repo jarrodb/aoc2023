@@ -5,6 +5,7 @@ mod day1;
 mod day2;
 mod day3;
 mod day4;
+mod day5;
 
 #[derive(Parser)]
 #[command(about="Advent of Code 2023")]
@@ -19,6 +20,7 @@ enum SubCommand {
     Day2,
     Day3,
     Day4,
+    Day5,
 }
 
 fn read_from_stdin() -> Vec<String> {
@@ -54,6 +56,11 @@ fn main() {
             let data = read_from_stdin();
             println!("part1: {}", day4::part1(&data));
             println!("part2: {}", day4::part2(&data));
+        },
+        Some(SubCommand::Day5) => {
+            let data = read_from_stdin();
+            println!("part1: {}", day5::part1(&data));
+            println!("part2: {}", day5::part2(&data));
         },
         _ => {
             println!("no subcommand given");
