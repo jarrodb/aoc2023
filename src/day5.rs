@@ -15,28 +15,26 @@ impl Map {
 }
 
 pub fn part1(input: &Vec<String>) -> i128 {
-    let mut sections = Vec::<Vec<Map>>::new();
+    let mut sections = Vec::new();
 
     // capture the seeds on line 1
     let seeds: Vec<i128> = input[0]
+        .trim()
         .split(" ")
         .filter_map(|e| e.parse::<i128>().ok())
         .collect();
 
-    let mut map = Vec::<Map>::new();
+    let mut maps = Vec::<Map>::new();
 
     for line in input.iter().skip(2) {
-        if line.is_empty() {
-            // signals the end of a map
-            if map.len() > 0 {
-                sections.push(map);
-            }
-            map = Vec::<Map>::new();
-            continue;
-        }
-
         if !line.chars().nth(0).unwrap().is_digit(10) {
-            // we don't care about map names
+            // moving to the next map, append current to sections
+            if maps.len() > 0 {
+                println!("processing empty line, reset map");
+                sections.push(maps);
+            }
+            maps = Vec::<Map>::new();
+
             continue;
         }
 
@@ -46,12 +44,12 @@ pub fn part1(input: &Vec<String>) -> i128 {
             .filter_map(|e| e.parse::<i128>().ok())
             .collect();
         let m = Map{dst: entry[0], src: entry[1], range: entry[2]};
-        map.push(m);
+        maps.push(m);
     }
 
     // push the last map
-    if map.len() > 0 {
-        sections.push(map);
+    if maps.len() > 0 {
+        sections.push(maps);
     }
 
     let mut lowest = 0;
@@ -130,5 +128,19 @@ mod tests {
     #[test]
     fn test_part2() {
         assert_eq!(part2(&test_data()), 0);
+    }
+
+    #[test]
+    fn test_map_destination() {
+        let mut m = crate::day5::Map{dst: 43048329, src: 2909431, range: 10};
+        assert_eq!(m.destination(2909431), 43048329);
+        assert_eq!(m.destination(2909433), 43048331);
+        assert_eq!(m.destination(0), -1);
+
+        m = crate::day5::Map{dst: 0, src: 2909431, range: 10};
+        assert_eq!(m.destination(2909432), 1);
+
+        m = crate::day5::Map{dst: 94302, src: 0, range: 10};
+        assert_eq!(m.destination(7), 94309);
     }
 }
