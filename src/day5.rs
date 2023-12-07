@@ -36,7 +36,6 @@ fn parse_sections(input: &Vec<String>) -> Vec<Vec<Map>> {
         if !line.chars().nth(0).unwrap().is_digit(10) {
             // moving to the next map, append current to sections
             if maps.len() > 0 {
-                println!("processing empty line, reset map");
                 sections.push(maps);
             }
             maps = Vec::<Map>::new();
@@ -61,25 +60,27 @@ fn parse_sections(input: &Vec<String>) -> Vec<Vec<Map>> {
     return sections;
 }
 
+fn location_number(seed: i128, sections: &Vec<Vec<Map>>) -> i128 {
+    let mut src = seed;
+    for section in sections.iter() { // translate for each section map
+        for map in section.iter() { // check if valid destination
+            let dst = map.destination(src);
+            if dst > -1 {
+                src = dst;
+                break;
+            }
+        }
+    }
+    return src;
+}
+
 pub fn part1(input: &Vec<String>) -> i128 {
-    // capture the seeds on line 1
     let seeds = parse_seeds(&input[0]);
-
     let sections = parse_sections(&input);
-
     let mut lowest = 0;
 
     for seed in seeds.iter() { // iterate through all seeds
-        let mut src = *seed;
-        for section in sections.iter() { // translate for each section map
-            for map in section.iter() { // check if valid destination
-                let dst = map.destination(src);
-                if dst > -1 {
-                    src = dst;
-                    break;
-                }
-            }
-        }
+        let src = location_number(*seed, &sections);
 
         lowest = if lowest == 0 { src } else { std::cmp::min(lowest, src) };
     }
@@ -87,8 +88,20 @@ pub fn part1(input: &Vec<String>) -> i128 {
     return lowest;
 }
 
-pub fn part2(_input: &Vec<String>) -> i128 {
-    return 0;
+pub fn part2(input: &Vec<String>) -> i128 {
+    let seeds = parse_seeds(&input[0]);
+    let sections = parse_sections(&input);
+    let mut lowest = 0;
+
+    for (i, data) in seeds.iter().step_by(2).enumerate() { // iterate through all seeds
+        for seed in *data..*data+seeds[i*2+1]-1 {
+            let src = location_number(seed, &sections);
+
+            lowest = if lowest == 0 { src } else { std::cmp::min(lowest, src) };
+        }
+    }
+
+    return lowest;
 }
 
 #[cfg(test)]
@@ -142,7 +155,7 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(&test_data()), 0);
+        assert_eq!(part2(&test_data()), 46);
     }
 
     #[test]
