@@ -5,7 +5,7 @@ pub enum Data {
     Real,
 }
 
-fn test_data() -> Vec<(i32, i32)> {
+fn test_data() -> Vec<(i64, i64)> {
     // (time, distance)
     return vec![
         (7, 9),
@@ -14,7 +14,7 @@ fn test_data() -> Vec<(i32, i32)> {
     ];
 }
 
-fn real_data() -> Vec<(i32, i32)> {
+fn real_data() -> Vec<(i64, i64)> {
     // (time, distance)
     return vec![
         (48, 255),
@@ -24,34 +24,55 @@ fn real_data() -> Vec<(i32, i32)> {
     ];
 }
 
-pub fn part1(input: Data) -> i32 {
-    // holding down button charges boat
-    // release button moves boat 
-    // moves fast if button held down longer
-    // 7 ms -> 9 mm
+fn calculate_records(time: i64, distance: i64) -> i64 {
+    let mut records: i64 = 0;
+    for hold_t in 1..time {
+        if hold_t * (time - hold_t) > distance {
+            records += 1;
+        }
+    }
+    return records
+}
 
+pub fn part1(input: Data) -> i64 {
     let data = match input {
         Data::Test => test_data(),
         _ => real_data(),
     };
 
-    let mut times: Vec<i32> = Vec::new();
+    let mut times: Vec<i64> = Vec::new();
 
     for (time, distance) in data {
-        let mut records: i32 = 0;
-        for hold_t in 1..time {
-            if hold_t * (time - hold_t) > distance {
-                records += 1;
-            }
-        }
+        let records = calculate_records(time, distance);
         times.push(records);
     }
 
     return times.iter().product();
 }
 
-pub fn part2(_input: Data) -> i32 {
-    return 0;
+pub fn part2(input: Data) -> i64 {
+    let data = match input {
+        Data::Test => test_data(),
+        _ => real_data(),
+    };
+
+    let time = data
+        .iter()
+        .map(|x| x.0.to_string())
+        .collect::<Vec<String>>()
+        .join("")
+        .parse::<i64>()
+        .unwrap();
+
+    let distance = data
+        .iter()
+        .map(|x| x.1.to_string())
+        .collect::<Vec<String>>()
+        .join("")
+        .parse::<i64>()
+        .unwrap();
+
+    return calculate_records(time, distance);
 }
 
 #[cfg(test)]
@@ -67,6 +88,6 @@ mod tests {
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(Data::Test), 0);
+        assert_eq!(part2(Data::Test), 71503);
     }
 }
