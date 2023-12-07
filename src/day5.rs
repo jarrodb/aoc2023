@@ -2,12 +2,12 @@
 struct Map {
     src: i128,
     dst: i128,
-    range: i128,
+    end: i128,
 }
 
 impl Map {
     fn destination(&self, src: i128) -> i128 {
-        if self.src <= src && src < (self.src + self.range) {
+        if self.src <= src && src < self.end {
             return self.dst + (src - self.src);
         }
         return -1; // not found
@@ -22,7 +22,7 @@ fn parse_seeds(input: &str) -> Vec<i128> {
         .collect();
 }
 
-fn parse_sections(input: &Vec<String>) -> Vec<Vec<Map>> {
+fn parse_sections(input: &Vec<String>, reverse: bool) -> Vec<Vec<Map>> {
     let mut sections: Vec<Vec<Map>> = Vec::new();
 
     let mut maps = Vec::<Map>::new();
@@ -48,7 +48,14 @@ fn parse_sections(input: &Vec<String>) -> Vec<Vec<Map>> {
             .split(" ")
             .filter_map(|e| e.parse::<i128>().ok())
             .collect();
-        let m = Map{dst: entry[0], src: entry[1], range: entry[2]};
+
+        let src_idx = if reverse { 0 } else { 1 };
+
+        let m = Map{
+            dst: entry[if reverse { 1 } else { 0 }],
+            src: entry[src_idx],
+            end: entry[2] + entry[src_idx],
+        };
         maps.push(m);
     }
 
@@ -57,7 +64,7 @@ fn parse_sections(input: &Vec<String>) -> Vec<Vec<Map>> {
         sections.push(maps);
     }
 
-    return sections;
+    return if reverse { sections.into_iter().rev().collect() } else { sections };
 }
 
 fn location_number(seed: i128, sections: &Vec<Vec<Map>>) -> i128 {
@@ -76,7 +83,7 @@ fn location_number(seed: i128, sections: &Vec<Vec<Map>>) -> i128 {
 
 pub fn part1(input: &Vec<String>) -> i128 {
     let seeds = parse_seeds(&input[0]);
-    let sections = parse_sections(&input);
+    let sections = parse_sections(&input, false);
     let mut lowest = 0;
 
     for seed in seeds.iter() { // iterate through all seeds
@@ -88,26 +95,37 @@ pub fn part1(input: &Vec<String>) -> i128 {
     return lowest;
 }
 
+// This attempts to reverse the section maps and search by location values
+// to produce a seed value that can be checked against the seed list.
 pub fn part2(input: &Vec<String>) -> i128 {
     let seeds = parse_seeds(&input[0]);
-    let sections = parse_sections(&input);
-    let mut lowest = 0;
+    let sections = parse_sections(&input, true);
 
-    for (i, data) in seeds.iter().step_by(2).enumerate() { // iterate through all seeds
-        for seed in *data..*data+seeds[i*2+1]-1 {
-            let src = location_number(seed, &sections);
-
-            lowest = if lowest == 0 { src } else { std::cmp::min(lowest, src) };
+    // build the list of seeds using the range value
+    let mut seed_ranges = Vec::<i128>::new();
+    for (i, seed) in seeds.iter().step_by(2).enumerate() {
+        for s in *seed..*seed+seeds[i*2+1] {
+            seed_ranges.push(s);
         }
     }
 
-    return lowest;
+    let mut i = 0;
+    loop {
+        let src = location_number(i, &sections);
+        println!("{}: {}", i, src);
+        if seed_ranges.contains(&src) {
+            return i;
+        }
+        i += 1;
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::day5::part1;
     use crate::day5::part2;
+    use crate::day5::parse_sections;
+    use crate::day5::location_number;
 
     fn test_data() -> Vec<String> {
         let data = vec![
@@ -159,16 +177,22 @@ mod tests {
     }
 
     #[test]
+    fn test_reverse() {
+        let sections = parse_sections(&test_data(), true);
+        assert_eq!(location_number(46, &sections), 82);
+    }
+
+    #[test]
     fn test_map_destination() {
-        let mut m = crate::day5::Map{dst: 43048329, src: 2909431, range: 10};
+        let mut m = crate::day5::Map{dst: 43048329, src: 2909431, end: 2909431+10};
         assert_eq!(m.destination(2909431), 43048329);
         assert_eq!(m.destination(2909433), 43048331);
         assert_eq!(m.destination(0), -1);
 
-        m = crate::day5::Map{dst: 0, src: 2909431, range: 10};
+        m = crate::day5::Map{dst: 0, src: 2909431, end: 2909431+10};
         assert_eq!(m.destination(2909432), 1);
 
-        m = crate::day5::Map{dst: 94302, src: 0, range: 10};
+        m = crate::day5::Map{dst: 94302, src: 0, end: 10};
         assert_eq!(m.destination(7), 94309);
     }
 }
