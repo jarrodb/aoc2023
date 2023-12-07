@@ -14,19 +14,25 @@ impl Map {
     }
 }
 
-pub fn part1(input: &Vec<String>) -> i128 {
-    let mut sections = Vec::new();
-
-    // capture the seeds on line 1
-    let seeds: Vec<i128> = input[0]
+fn parse_seeds(input: &str) -> Vec<i128> {
+    return input
         .trim()
         .split(" ")
         .filter_map(|e| e.parse::<i128>().ok())
         .collect();
+}
+
+fn parse_sections(input: &Vec<String>) -> Vec<Vec<Map>> {
+    let mut sections: Vec<Vec<Map>> = Vec::new();
 
     let mut maps = Vec::<Map>::new();
 
     for line in input.iter().skip(2) {
+        if line.trim().is_empty() {
+            // skip empty lines
+            continue;
+        }
+
         if !line.chars().nth(0).unwrap().is_digit(10) {
             // moving to the next map, append current to sections
             if maps.len() > 0 {
@@ -52,6 +58,15 @@ pub fn part1(input: &Vec<String>) -> i128 {
         sections.push(maps);
     }
 
+    return sections;
+}
+
+pub fn part1(input: &Vec<String>) -> i128 {
+    // capture the seeds on line 1
+    let seeds = parse_seeds(&input[0]);
+
+    let sections = parse_sections(&input);
+
     let mut lowest = 0;
 
     for seed in seeds.iter() { // iterate through all seeds
@@ -65,7 +80,7 @@ pub fn part1(input: &Vec<String>) -> i128 {
                 }
             }
         }
-        //println!("seed {} -> {}", seed, src);
+
         lowest = if lowest == 0 { src } else { std::cmp::min(lowest, src) };
     }
 
