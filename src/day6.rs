@@ -5,6 +5,40 @@ pub enum Data {
     Real,
 }
 
+pub fn part1(input: Data) -> i64 {
+    let data = gimme_data(input);
+    let mut times: Vec<i64> = Vec::new();
+
+    for (time, distance) in data {
+        let records = calculate_records(time, distance);
+        times.push(records);
+    }
+
+    return times.iter().product();
+}
+
+pub fn part2(input: Data) -> i64 {
+    let data = gimme_data(input);
+
+    let time = data
+        .iter()
+        .map(|x| x.0.to_string())
+        .collect::<Vec<String>>()
+        .join("")
+        .parse::<i64>()
+        .unwrap();
+
+    let distance = data
+        .iter()
+        .map(|x| x.1.to_string())
+        .collect::<Vec<String>>()
+        .join("")
+        .parse::<i64>()
+        .unwrap();
+
+    return calculate_records(time, distance);
+}
+
 fn test_data() -> Vec<(i64, i64)> {
     // (time, distance)
     return vec![
@@ -24,6 +58,13 @@ fn real_data() -> Vec<(i64, i64)> {
     ];
 }
 
+fn gimme_data(input: Data) -> Vec<(i64, i64)> {
+    return match input {
+        Data::Test => test_data(),
+        _ => real_data(),
+    };
+}
+
 fn calculate_records(time: i64, distance: i64) -> i64 {
     let mut records: i64 = 0;
     for hold_t in 1..time {
@@ -32,47 +73,6 @@ fn calculate_records(time: i64, distance: i64) -> i64 {
         }
     }
     return records
-}
-
-pub fn part1(input: Data) -> i64 {
-    let data = match input {
-        Data::Test => test_data(),
-        _ => real_data(),
-    };
-
-    let mut times: Vec<i64> = Vec::new();
-
-    for (time, distance) in data {
-        let records = calculate_records(time, distance);
-        times.push(records);
-    }
-
-    return times.iter().product();
-}
-
-pub fn part2(input: Data) -> i64 {
-    let data = match input {
-        Data::Test => test_data(),
-        _ => real_data(),
-    };
-
-    let time = data
-        .iter()
-        .map(|x| x.0.to_string())
-        .collect::<Vec<String>>()
-        .join("")
-        .parse::<i64>()
-        .unwrap();
-
-    let distance = data
-        .iter()
-        .map(|x| x.1.to_string())
-        .collect::<Vec<String>>()
-        .join("")
-        .parse::<i64>()
-        .unwrap();
-
-    return calculate_records(time, distance);
 }
 
 #[cfg(test)]
