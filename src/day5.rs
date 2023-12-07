@@ -102,19 +102,19 @@ pub fn part2(input: &Vec<String>) -> i128 {
     let sections = parse_sections(&input, true);
 
     // build the list of seeds using the range value
-    let mut seed_ranges = Vec::<i128>::new();
+    let mut seed_ranges = Vec::<(i128, i128)>::new();
     for (i, seed) in seeds.iter().step_by(2).enumerate() {
-        for s in *seed..*seed+seeds[i*2+1] {
-            seed_ranges.push(s);
-        }
+        seed_ranges.push((*seed, *seed+seeds[i*2+1]));
     }
 
     let mut i = 0;
     loop {
         let src = location_number(i, &sections);
-        println!("{}: {}", i, src);
-        if seed_ranges.contains(&src) {
-            return i;
+        // check if src is within seed_ranges
+        for (seed, end) in seed_ranges.iter() {
+            if *seed <= src && src <= *end {
+                return i;
+            }
         }
         i += 1;
     }
